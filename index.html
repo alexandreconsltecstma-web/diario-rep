@@ -601,13 +601,13 @@ footer .credit { padding-right: 62px; }
         <span id="renovTxt"></span>
         <span class="hint" id="renovInfo"></span>
         <details class="renov-edit" id="renovEdit" hidden>
-          <summary>Ajustar data e avisos por e-mail</summary>
+          <summary>Vencimento e e-mail para alertas</summary>
           <form id="renovForm" onsubmit="return false">
             <div class="row2">
               <div class="field"><label for="renovNome">Domínio</label><input type="text" id="renovNome" maxlength="80" autocomplete="off"></div>
               <div class="field"><label for="renovExpira">Vence em</label><input type="date" id="renovExpira"></div>
             </div>
-            <div class="field"><label for="renovAvisar">E-mails que recebem o aviso (até 3, separados por vírgula)</label><input type="text" id="renovAvisar" maxlength="200" placeholder="Vazio = só o administrador do site" autocomplete="off"><span class="hint">O aviso sai sozinho aos 90, 60, 30, 14, 7, 3 e 1 dia do vencimento, e no dia.</span></div>
+            <div class="field"><label for="renovAvisar">E-mail para alertas (até 3, separados por vírgula)</label><input type="text" id="renovAvisar" maxlength="200" placeholder="Vazio = só o administrador do site" autocomplete="off"><span class="hint">O aviso sai sozinho aos 90, 60, 30, 14, 7, 3 e 1 dia do vencimento, e no dia.</span></div>
             <div class="err" id="renovErr" role="alert" hidden></div>
             <div class="okmsg" id="renovOk" role="status" hidden></div>
             <div class="actions"><button class="btn" type="submit" id="renovSave">Salvar</button><button class="btn line" type="button" id="renovRenew">Já renovei (+1 ano)</button><a class="btn line" href="https://registro.br/painel/" target="_blank" rel="noopener noreferrer">Abrir Registro.br</a></div>
@@ -1182,7 +1182,7 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
       : dias === 0 ? 'Vence HOJE (' + fmtBR(d.expira) + '). Renove agora!'
       : 'VENCIDO há ' + (-dias) + ' dia' + (dias === -1 ? '' : 's') + ' (' + fmtBR(d.expira) + '). O Diário pode sair do ar: renove já!';
     $('renovInfo').textContent = d.nome + ' · renove em registro.br com a conta do titular (Antecipar renovação).' + (can('dominio.manage') ? (d.avisar ? ' Aviso por e-mail: ' + d.avisar.replace(/,/g, ', ') + '.' : ' Aviso por e-mail: administrador do site.') : '');
-    $('renovEdit').hidden = !can('dominio.manage');
+    $('renovEdit').hidden = !can('dominio.manage'); if (can('dominio.manage') && !d.avisar) $('renovEdit').open = true;
     $('renovNome').value = d.nome; $('renovExpira').value = d.expira; $('renovAvisar').value = (d.avisar || '').replace(/,/g, ', ');
   }
   async function loadDominio() {
