@@ -193,8 +193,16 @@ input[type="text"], input[type="password"], input[type="date"], input[type="time
 }
 .band:not(.alt) .box input, .band:not(.alt) .box select, .band:not(.alt) .box textarea { background: var(--surface); }
 textarea { min-height: 112px; resize: vertical; }
-.renov { display: grid; gap: 4px; margin: 0 0 14px; padding: 12px 16px; border: 1px solid var(--gold); border-left-width: 4px; border-radius: 8px; background: var(--gold-soft); font-size: 0.9rem; }
-.renov.warn { border-color: #b3261e; background: #fdecea; }
+.renov { display: grid; gap: 6px; margin: 0 0 14px; padding: 12px 16px; border: 1px solid var(--line); border-left: 4px solid #2e7d4f; border-radius: 8px; background: var(--surface); font-size: 0.9rem; }
+.renov.warn { border-color: var(--gold); border-left-color: var(--gold); background: var(--gold-soft); }
+.renov.danger { border-color: #b3261e; border-left-color: #b3261e; background: #fdecea; }
+.renov-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.renov-badge { font-size: 0.7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: #2e7d4f; color: #fff; }
+.renov.warn .renov-badge { background: #8a6410; }
+.renov.danger .renov-badge { background: #b3261e; }
+.renov-edit summary { cursor: pointer; font-weight: 600; font-size: 0.84rem; padding: 4px 0; }
+.renov-edit form { display: grid; gap: 10px; padding-top: 8px; }
+.pubact { display: flex; gap: 6px; }
 .hint { font-size: 0.82rem; color: var(--muted); }
 .err { font-size: 0.85rem; font-weight: 600; color: var(--warn-ink); background: var(--warn-bg); padding: 8px 12px; border-radius: 6px; }
 .opts { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -588,10 +596,23 @@ footer .credit { padding-right: 62px; }
           </div>
         </div>
       </details>
-      <div class="renov" id="renovBox" hidden role="note">
-        <strong>Lembrete: renovação do domínio</strong>
+      <div class="renov" id="renovBox" hidden role="note" aria-live="polite">
+        <div class="renov-head"><strong>Domínio do Diário</strong><span class="renov-badge" id="renovBadge"></span></div>
         <span id="renovTxt"></span>
-        <span class="hint">Domínio <b>repgremio.com.br</b> (Registro.br) · registrado em 04/11/2026 · vence em <b>04/11/2027</b>. Renove pelo painel do Registro.br com antecedência.</span>
+        <span class="hint" id="renovInfo"></span>
+        <details class="renov-edit" id="renovEdit" hidden>
+          <summary>Ajustar data e avisos por e-mail</summary>
+          <form id="renovForm" onsubmit="return false">
+            <div class="row2">
+              <div class="field"><label for="renovNome">Domínio</label><input type="text" id="renovNome" maxlength="80" autocomplete="off"></div>
+              <div class="field"><label for="renovExpira">Vence em</label><input type="date" id="renovExpira"></div>
+            </div>
+            <div class="field"><label for="renovAvisar">E-mails que recebem o aviso (até 3, separados por vírgula)</label><input type="text" id="renovAvisar" maxlength="200" placeholder="Vazio = só o administrador do site" autocomplete="off"><span class="hint">O aviso sai sozinho aos 90, 60, 30, 14, 7, 3 e 1 dia do vencimento, e no dia.</span></div>
+            <div class="err" id="renovErr" role="alert" hidden></div>
+            <div class="okmsg" id="renovOk" role="status" hidden></div>
+            <div class="actions"><button class="btn" type="submit" id="renovSave">Salvar</button><button class="btn line" type="button" id="renovRenew">Já renovei (+1 ano)</button><a class="btn line" href="https://registro.br/painel/" target="_blank" rel="noopener noreferrer">Abrir Registro.br</a></div>
+          </form>
+        </details>
       </div>
       <div class="tabs" role="tablist" aria-label="Setores">
         <button type="button" role="tab" id="tabP" aria-selected="true" aria-controls="panP">Presidência</button>
@@ -637,7 +658,7 @@ Pauta: eleição da comissão da gincana e informes da ouvidoria.</textarea></di
 
       <div class="split" id="panS" role="tabpanel" aria-labelledby="tabS" hidden>
         <div class="box span2" id="pubBox">
-          <h3>Publicar no Diário Oficial</h3>
+          <h3 id="pubHead">Publicar no Diário Oficial</h3>
           <form id="pubForm" onsubmit="return false">
             <p class="hint">O documento aparece na hora na lista pública do Diário. Confira o número e a data antes de publicar.</p>
             <div class="row2">
@@ -654,7 +675,7 @@ Pauta: eleição da comissão da gincana e informes da ouvidoria.</textarea></di
             <div class="field"><label for="pubLink">Link externo, se não for anexar arquivo (opcional)</label><input type="text" inputmode="url" id="pubLink" maxlength="500" placeholder="https://..."></div>
             <div class="err" id="pubErr" role="alert" hidden></div>
             <div class="okmsg" id="pubOk" role="status" hidden></div>
-            <div class="actions"><button class="btn" type="submit" id="pubSend">Publicar no Diário</button><button class="btn line" type="button" id="pubFromAta">Usar a ata do gerador</button></div>
+            <div class="actions"><button class="btn" type="submit" id="pubSend">Publicar no Diário</button><button class="btn line" type="button" id="pubCancelEdit" hidden>Cancelar edição</button><button class="btn line" type="button" id="pubFromAta">Usar a ata do gerador</button></div>
           </form>
           <h3 style="margin-top:26px">Já publicados</h3>
           <div id="pubList"><p class="hint">Carregando...</p></div>
@@ -1045,12 +1066,8 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
     $('dirWho').textContent = NOME[s.papel] || s.papel;
     var vis = { tabP: s.papel === 'presidencia', tabS: can('docs.add'), tabO: can('ouv.list'), tabG: can('grem.manage') };
     tabs.forEach(function (t) { $(t[0]).hidden = !vis[t[0]]; });
-    var rb = $('renovBox'); rb.hidden = s.papel !== 'presidencia';
-    if (!rb.hidden) {
-      var dias = Math.ceil((new Date(2027, 10, 4) - new Date()) / 86400000);
-      rb.classList.toggle('warn', dias <= 60);
-      $('renovTxt').textContent = dias > 0 ? 'Faltam ' + dias + ' dias para o vencimento (04/11/2027).' + (dias <= 60 ? ' Renove agora!' : '') : 'O domínio venceu! Renove imediatamente no Registro.br.';
-    }
+    $('renovBox').hidden = s.papel !== 'presidencia';
+    if (s.papel === 'presidencia') loadDominio();
     var first = tabs.filter(function (t) { return vis[t[0]]; })[0];
     $('dirTools').querySelector('.tabs').hidden = tabs.filter(function (t) { return vis[t[0]]; }).length < 2;
     selectTab(first[0]);
@@ -1098,6 +1115,12 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
       var left = el('div'); left.appendChild(el('strong', null, a.tipo + ' ' + a.numero));
       left.appendChild(el('div', 'm', fmtBR(a.data) + ' · ' + a.titulo + (a.link && /drive\.google\.com/.test(a.link) ? ' · com anexo' : '')));
       it.appendChild(left);
+      var act = el('div', 'pubact');
+      if (can('docs.edit')) {
+        var eb = el('button', 'btn line', 'Editar'); eb.type = 'button';
+        eb.addEventListener('click', function () { startEdit(a); });
+        act.appendChild(eb);
+      }
       var b = el('button', 'btn line', 'Retirar'); b.type = 'button';
       var armed = false;
       b.addEventListener('click', async function () {
@@ -1107,7 +1130,7 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
         if (r && r.ok) { renderPub(r.atos); reloadPublic(r.atos); showMsg('pubOk', 'Documento retirado do Diário.'); }
         else { b.disabled = false; showMsg('pubOk', ''); $('pubErr').textContent = (r && r.erro) || 'Não foi possível retirar.'; $('pubErr').hidden = false; }
       });
-      it.appendChild(b); box.appendChild(it);
+      act.appendChild(b); it.appendChild(act); box.appendChild(it);
     });
   }
   async function loadPub() {
@@ -1117,6 +1140,79 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
     var r = await call({ action: 'docs.list' });
     if (r && r.ok) renderPub(r.atos);
   }
+  /* presidência: editar publicação já feita */
+  var editId = '';
+  function resetEdit() {
+    editId = '';
+    $('pubHead').textContent = 'Publicar no Diário Oficial';
+    $('pubSend').textContent = 'Publicar no Diário';
+    $('pubCancelEdit').hidden = true;
+  }
+  function startEdit(a) {
+    resetEdit();
+    editId = String(a.id);
+    var sel = $('pubTipo');
+    if (!Array.prototype.some.call(sel.options, function (o) { return o.value === a.tipo; })) { var op = document.createElement('option'); op.textContent = a.tipo; sel.appendChild(op); }
+    sel.value = a.tipo; $('pubNum').value = a.numero; $('pubData').value = a.data; $('pubEd').value = a.edicao || '';
+    $('pubTitulo').value = a.titulo; $('pubTexto').value = a.texto || ''; $('pubLink').value = a.link || ''; $('pubFile').value = '';
+    $('pubHead').textContent = 'Editar: ' + a.tipo + ' ' + a.numero;
+    $('pubSend').textContent = 'Salvar alterações'; $('pubCancelEdit').hidden = false;
+    showMsg('pubOk', 'Editando ' + a.tipo + ' ' + a.numero + '. Para trocar o anexo, escolha outro arquivo. Para tirar o anexo, apague o link abaixo.'); $('pubErr').hidden = true;
+    selectTab('tabS'); $('pubBox').scrollIntoView({ block: 'start' });
+  }
+  $('pubCancelEdit').addEventListener('click', function () {
+    resetEdit(); showMsg('pubOk', ''); $('pubErr').hidden = true;
+    ['pubNum', 'pubTitulo', 'pubTexto', 'pubLink', 'pubFile'].forEach(function (id) { $(id).value = ''; });
+  });
+
+  /* presidência: monitoramento do vencimento do domínio */
+  var DOM = { nome: 'repgremio.com.br', expira: '2027-11-04', avisar: '' };
+  function diasAte(iso) {
+    var p = iso.split('-'), hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    return Math.round((new Date(+p[0], +p[1] - 1, +p[2]) - hoje) / 86400000);
+  }
+  function renderDominio(d) {
+    DOM = d;
+    var dias = diasAte(d.expira), box = $('renovBox');
+    box.classList.toggle('warn', dias <= 90 && dias > 30);
+    box.classList.toggle('danger', dias <= 30);
+    $('renovBadge').textContent = dias > 90 ? 'Em dia' : dias > 30 ? 'Atenção' : dias > 0 ? 'Urgente' : 'Vencido';
+    $('renovTxt').textContent = dias > 1 ? 'Faltam ' + dias + ' dias para vencer (' + fmtBR(d.expira) + ').' + (dias <= 90 ? ' Hora de renovar.' : '')
+      : dias === 1 ? 'Vence amanhã (' + fmtBR(d.expira) + '). Renove hoje!'
+      : dias === 0 ? 'Vence HOJE (' + fmtBR(d.expira) + '). Renove agora!'
+      : 'VENCIDO há ' + (-dias) + ' dia' + (dias === -1 ? '' : 's') + ' (' + fmtBR(d.expira) + '). O Diário pode sair do ar: renove já!';
+    $('renovInfo').textContent = d.nome + ' · renove em registro.br com a conta do titular (Antecipar renovação).' + (can('dominio.manage') ? (d.avisar ? ' Aviso por e-mail: ' + d.avisar.replace(/,/g, ', ') + '.' : ' Aviso por e-mail: administrador do site.') : '');
+    $('renovEdit').hidden = !can('dominio.manage');
+    $('renovNome').value = d.nome; $('renovExpira').value = d.expira; $('renovAvisar').value = (d.avisar || '').replace(/,/g, ', ');
+  }
+  async function loadDominio() {
+    renderDominio(DOM);
+    if (!can('dominio.manage')) return;
+    var r = await call({ action: 'dominio.get' });
+    if (r && r.ok && r.dominio) renderDominio(r.dominio);
+  }
+  async function saveDominio(expira, btn, rotulo) {
+    showMsg('renovOk', ''); $('renovErr').hidden = true;
+    btn.disabled = true;
+    var r = await call({ action: 'dominio.save', nome: $('renovNome').value, expira: expira, avisar: $('renovAvisar').value });
+    btn.disabled = false; btn.textContent = rotulo;
+    if (r && r.ok) { renderDominio(r.dominio); showMsg('renovOk', 'Salvo.'); }
+    else { $('renovErr').textContent = (r && r.erro) || 'Não foi possível salvar.'; $('renovErr').hidden = false; }
+  }
+  $('renovForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!$('renovExpira').value) { $('renovErr').textContent = 'Informe a data de vencimento.'; $('renovErr').hidden = false; return; }
+    saveDominio($('renovExpira').value, $('renovSave'), 'Salvar');
+  });
+  (function () {
+    var b = $('renovRenew'), armed = false;
+    b.addEventListener('click', function () {
+      var p = ($('renovExpira').value || DOM.expira).split('-'), novo = (+p[0] + 1) + '-' + p[1] + '-' + p[2];
+      if (!armed) { armed = true; b.textContent = 'Confirmar: vence em ' + fmtBR(novo); setTimeout(function () { armed = false; b.textContent = 'Já renovei (+1 ano)'; }, 5000); return; }
+      armed = false; saveDominio(novo, b, 'Já renovei (+1 ano)');
+    });
+  })();
+
   function readB64(f) {
     return new Promise(function (res, rej) {
       var r = new FileReader();
@@ -1132,29 +1228,33 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
   $('pubForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     showMsg('pubOk', ''); $('pubErr').hidden = true;
-    var d = { action: 'docs.add', tipo: $('pubTipo').value, numero: $('pubNum').value, data: $('pubData').value, edicao: $('pubEd').value, titulo: $('pubTitulo').value, texto: $('pubTexto').value, link: $('pubLink').value };
+    var d = { action: editId ? 'docs.edit' : 'docs.add', tipo: $('pubTipo').value, numero: $('pubNum').value, data: $('pubData').value, edicao: $('pubEd').value, titulo: $('pubTitulo').value, texto: $('pubTexto').value, link: $('pubLink').value };
     if (!d.numero.trim()) { $('pubErr').textContent = 'Informe o número do documento.'; $('pubErr').hidden = false; return; }
     if (!d.data) { $('pubErr').textContent = 'Informe a data.'; $('pubErr').hidden = false; return; }
     if (d.titulo.trim().length < 3) { $('pubErr').textContent = 'Informe o título ou a ementa.'; $('pubErr').hidden = false; return; }
+    if (editId) d.id = editId;
     var f = $('pubFile').files[0];
     if (f) {
       if (['application/pdf', 'image/jpeg', 'image/png'].indexOf(f.type) < 0) { $('pubErr').textContent = 'O anexo precisa ser PDF, JPG ou PNG.'; $('pubErr').hidden = false; return; }
       if (f.size > 6 * 1024 * 1024) { $('pubErr').textContent = 'O arquivo tem ' + (f.size / 1048576).toFixed(1).replace('.', ',') + ' MB. O limite é 6 MB: escaneie em qualidade menor.'; $('pubErr').hidden = false; return; }
     }
-    var btn = $('pubSend'); btn.disabled = true; btn.textContent = f ? 'Enviando arquivo...' : 'Publicando...';
+    var btn = $('pubSend'), rotulo = editId ? 'Salvar alterações' : 'Publicar no Diário'; btn.disabled = true; btn.textContent = f ? 'Enviando arquivo...' : (editId ? 'Salvando...' : 'Publicando...');
     if (f) {
       try { d.arquivo = { nome: f.name, tipo: f.type, b64: await readB64(f) }; }
-      catch (x) { btn.disabled = false; btn.textContent = 'Publicar no Diário'; $('pubErr').textContent = 'Não foi possível ler o arquivo.'; $('pubErr').hidden = false; return; }
+      catch (x) { btn.disabled = false; btn.textContent = rotulo; $('pubErr').textContent = 'Não foi possível ler o arquivo.'; $('pubErr').hidden = false; return; }
     }
     var r = await call(d);
-    btn.disabled = false; btn.textContent = 'Publicar no Diário';
+    btn.disabled = false; btn.textContent = rotulo;
     if (r && r.ok) {
-      showMsg('pubOk', d.tipo + ' ' + d.numero + ' publicado no Diário.');
+      var editou = !!editId;
       renderPub(r.atos); reloadPublic(r.atos);
+      resetEdit();
+      showMsg('pubOk', editou ? 'Alterações salvas: o Diário já mostra a versão corrigida.' : d.tipo + ' ' + d.numero + ' publicado no Diário.');
       ['pubNum', 'pubTitulo', 'pubTexto', 'pubLink', 'pubFile'].forEach(function (id) { $(id).value = ''; });
-    } else { $('pubErr').textContent = (r && r.erro) || 'Não foi possível publicar.'; $('pubErr').hidden = false; }
+    } else { $('pubErr').textContent = (r && r.erro) || (editId ? 'Não foi possível salvar.' : 'Não foi possível publicar.'); $('pubErr').hidden = false; }
   });
   function fillPub(tipo, num, data, titulo, texto) {
+    resetEdit();
     $('pubTipo').value = tipo; $('pubNum').value = num; $('pubData').value = data || todayIso;
     $('pubTitulo').value = titulo; $('pubTexto').value = texto;
     showMsg('pubOk', ''); $('pubErr').hidden = true;
