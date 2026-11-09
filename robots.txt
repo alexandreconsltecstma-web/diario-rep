@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://repgremio.com.br/sitemap.xml
