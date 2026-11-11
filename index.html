@@ -261,6 +261,9 @@ ol.steps li > div { min-width: 0; padding-top: 4px; }
 .gcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 22px; }
 .gcard { background: var(--bg); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: 8px; padding: 14px 16px; }
 .gcard strong { display: block; font-family: var(--serif); font-size: 1.2rem; }
+.gturma { display: block; margin-top: 4px; font-size: 0.78rem; color: var(--muted); }
+.gcont { display: grid; gap: 2px; margin-top: 8px; font-size: 0.82rem; word-break: break-all; }
+.gcont a { color: inherit; text-decoration: underline; }
 .gcard span { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; font-weight: 600; }
 .check { display: flex; gap: 10px; align-items: flex-start; font-size: 0.86rem; }
 .check input { margin-top: 3px; }
@@ -748,7 +751,7 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
         <div class="box">
           <h3 id="gremTitulo">Adicionar gremista</h3>
           <form id="gremForm" onsubmit="return false">
-            <p class="hint">Cadastro interno da Presidência. Só aparece no site quem for marcado para isso, e apenas com nome e cargo (a turma nunca aparece).</p>
+            <p class="hint">Cadastro interno da Presidência. Só aparece no site quem for marcado para isso, com nome, cargo e turma. Endereço, telefone e e-mail ficam só aqui, a menos que você marque mostrar o contato.</p>
             <input type="hidden" id="gremId" value="">
             <div class="field"><label for="gremNome">Nome completo</label><input type="text" id="gremNome" maxlength="80" autocomplete="off"></div>
             <div class="row2">
@@ -759,7 +762,13 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
               <div class="field"><label for="gremSit">Situação</label><select id="gremSit"><option>Ativo</option><option>Suplente</option><option>Desligado</option></select></div>
               <div class="field"><label for="gremIng">Ingresso no grêmio</label><input type="date" id="gremIng"></div>
             </div>
-            <label class="check"><input type="checkbox" id="gremPub"><span>Mostrar nome e cargo no quadro público do site</span></label>
+            <div class="field"><label for="gremEnd">Endereço</label><input type="text" id="gremEnd" maxlength="140" autocomplete="off" placeholder="Rua, número, bairro, cidade"></div>
+            <div class="row2">
+              <div class="field"><label for="gremTel">Telefone</label><input type="tel" id="gremTel" maxlength="25" autocomplete="off" placeholder="82 99999-9999"></div>
+              <div class="field"><label for="gremMail">E-mail</label><input type="email" id="gremMail" maxlength="80" autocomplete="off" placeholder="nome@exemplo.com"></div>
+            </div>
+            <label class="check"><input type="checkbox" id="gremPub"><span>Mostrar nome, cargo e turma no quadro público do site</span></label>
+            <label class="check"><input type="checkbox" id="gremCPub"><span>Mostrar também telefone e e-mail no quadro público (o endereço nunca aparece)</span></label>
             <div class="err" id="gremErr" role="alert" hidden></div>
             <div class="okmsg" id="gremOk" role="status" hidden></div>
             <div class="actions"><button class="btn" type="submit" id="gremSave">Adicionar</button><button class="btn line" type="button" id="gremCancel" hidden>Cancelar edição</button></div>
@@ -965,7 +974,9 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
   }
   function renderPublicGrem(list) {
     var g = $('gremGrid'); g.textContent = '';
-    list.forEach(function (x, i) { var c = el('div', 'gcard'); c.appendChild(el('strong', null, x.nome)); if (x.cargo) c.appendChild(el('span', null, x.cargo)); g.appendChild(c); watch(c, Math.min(i, 8) * 0.05); });
+    list.forEach(function (x, i) { var c = el('div', 'gcard'); c.appendChild(el('strong', null, x.nome)); if (x.cargo) c.appendChild(el('span', null, x.cargo)); if (x.turma) c.appendChild(el('small', 'gturma', 'Turma ' + x.turma));
+      if (x.telefone || x.email) { var k = el('div', 'gcont'); if (x.telefone) { var t = el('a', null, x.telefone); t.href = 'tel:' + x.telefone.replace(/[^\d+]/g, ''); k.appendChild(t); } if (x.email) { var em = el('a', null, x.email); em.href = 'mailto:' + x.email; k.appendChild(em); } c.appendChild(k); }
+      g.appendChild(c); watch(c, Math.min(i, 8) * 0.05); });
     $('gremistas').hidden = !list.length;
   }
   async function api(body) {
@@ -1320,8 +1331,8 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
 
   /* presidência: cadastro de gremistas */
   function gremReset() {
-    ['gremId', 'gremNome', 'gremCargo', 'gremTurma', 'gremIng'].forEach(function (i) { $(i).value = ''; });
-    $('gremSit').value = 'Ativo'; $('gremPub').checked = false;
+    ['gremId', 'gremNome', 'gremCargo', 'gremTurma', 'gremIng', 'gremEnd', 'gremTel', 'gremMail'].forEach(function (i) { $(i).value = ''; });
+    $('gremSit').value = 'Ativo'; $('gremPub').checked = false; $('gremCPub').checked = false;
     $('gremTitulo').textContent = 'Adicionar gremista'; $('gremSave').textContent = 'Adicionar'; $('gremCancel').hidden = true;
   }
   function renderGrem(list) {
@@ -1332,12 +1343,14 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
       var it = el('div', 'pubitem');
       var left = el('div'); left.appendChild(el('strong', null, x.nome));
       left.appendChild(el('div', 'm', [x.cargo, x.turma, x.situacao, x.publico === 'sim' ? 'no site' : 'só interno'].filter(Boolean).join(' · ')));
+      var ct = [x.endereco, x.telefone, x.email].filter(Boolean).join(' · '); if (ct) left.appendChild(el('div', 'm', ct));
       it.appendChild(left);
       var acts = el('div'); acts.style.display = 'flex'; acts.style.gap = '6px';
       var e = el('button', 'btn line', 'Editar'); e.type = 'button';
       e.addEventListener('click', function () {
         $('gremId').value = x.id; $('gremNome').value = x.nome; $('gremCargo').value = x.cargo; $('gremTurma').value = x.turma;
         $('gremSit').value = x.situacao || 'Ativo'; $('gremIng').value = x.ingresso; $('gremPub').checked = x.publico === 'sim';
+        $('gremEnd').value = x.endereco || ''; $('gremTel').value = x.telefone || ''; $('gremMail').value = x.email || ''; $('gremCPub').checked = x.contatoPublico === 'sim';
         $('gremTitulo').textContent = 'Editar gremista'; $('gremSave').textContent = 'Salvar alterações'; $('gremCancel').hidden = false;
         showMsg('gremOk', ''); $('gremErr').hidden = true; $('gremNome').focus();
       });
@@ -1363,7 +1376,7 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
     e.preventDefault(); showMsg('gremOk', ''); $('gremErr').hidden = true;
     if ($('gremNome').value.trim().length < 2) { $('gremErr').textContent = 'Informe o nome do gremista.'; $('gremErr').hidden = false; return; }
     var btn = $('gremSave'), old = btn.textContent; btn.disabled = true; btn.textContent = 'Salvando...';
-    var r = await call({ action: 'grem.save', id: $('gremId').value, nome: $('gremNome').value, cargo: $('gremCargo').value, turma: $('gremTurma').value, situacao: $('gremSit').value, ingresso: $('gremIng').value, publico: $('gremPub').checked });
+    var r = await call({ action: 'grem.save', id: $('gremId').value, nome: $('gremNome').value, cargo: $('gremCargo').value, turma: $('gremTurma').value, situacao: $('gremSit').value, ingresso: $('gremIng').value, publico: $('gremPub').checked, endereco: $('gremEnd').value, telefone: $('gremTel').value, email: $('gremMail').value, contatoPublico: $('gremCPub').checked });
     btn.disabled = false; btn.textContent = old;
     if (r && r.ok) { var edit = !!$('gremId').value; renderGrem(r.itens); refreshPublicGrem(); gremReset(); showMsg('gremOk', edit ? 'Alterações salvas.' : 'Gremista adicionado.'); }
     else { $('gremErr').textContent = (r && r.erro) || 'Não foi possível salvar.'; $('gremErr').hidden = false; }
