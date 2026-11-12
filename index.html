@@ -952,6 +952,7 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
               <div class="field"><label for="gremSit">Situação</label><select id="gremSit"><option>Ativo</option><option>Suplente</option><option>Desligado</option></select></div>
               <div class="field"><label for="gremIng">Ingresso no grêmio</label><input type="date" id="gremIng"></div>
             </div>
+            <div class="field"><label for="gremGrupo">Grupo no quadro público</label><select id="gremGrupo"><option value="">Automático (pelo cargo)</option></select></div>
             <div class="field"><label for="gremEnd">Endereço</label><input type="text" id="gremEnd" maxlength="140" autocomplete="off" placeholder="Rua, número, bairro, cidade"></div>
             <div class="row2">
               <div class="field"><label for="gremTel">Telefone</label><input type="tel" id="gremTel" maxlength="25" autocomplete="off" placeholder="82 99999-9999"></div>
@@ -963,6 +964,15 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
             <div class="okmsg" id="gremOk" role="status" hidden></div>
             <div class="actions"><button class="btn" type="submit" id="gremSave">Adicionar</button><button class="btn line" type="button" id="gremCancel" hidden>Cancelar edição</button></div>
           </form>
+        </div>
+        <div class="box" id="gruposBox">
+          <h3>Grupos do quadro</h3>
+          <p class="hint">Estes grupos organizam os gremistas no site. Renomeie, mude a ordem, adicione ou exclua. Ao excluir um grupo, quem estava nele volta para a escolha automática pelo cargo.</p>
+          <div id="gruposEd"></div>
+          <div class="row2"><div class="field"><label for="grupoNovo">Novo grupo</label><input type="text" id="grupoNovo" maxlength="60" autocomplete="off" placeholder="Ex.: Comissão de formatura"></div></div>
+          <div class="err" id="grupoErr" role="alert" hidden></div>
+          <div class="okmsg" id="grupoOk" role="status" hidden></div>
+          <div class="actions"><button class="btn line" type="button" id="grupoAdd">Adicionar grupo</button><button class="btn" type="button" id="grupoSave">Salvar grupos</button></div>
         </div>
         <div class="box">
           <h3>Gremistas cadastrados <span class="hint" id="gremCount"></span></h3>
@@ -1251,7 +1261,7 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
   function reloadPublic(list) { applyState({ edicao: edFrom(list), atos: list }); renderTypes(); render(); }
   if (API) {
     fetch(API).then(function (r) { return r.json(); }).then(function (d) {
-      if (d && d.ok && Array.isArray(d.gremistas)) renderPublicGrem(d.gremistas);
+      if (d && d.ok && Array.isArray(d.gremistas)) { if (Array.isArray(d.grupos) && d.grupos.length) GRUPOS = d.grupos; renderPublicGrem(d.gremistas); }
       if (d && d.ok && Array.isArray(d.fotos)) renderPublicFotos(d.fotos);
       if (d && d.ok && Array.isArray(d.atos)) { applyState({ edicao: d.edicao && d.edicao.numero ? d.edicao : edFrom(d.atos), atos: d.atos }); renderTypes(); render(); }
     }).catch(function () {});
@@ -1362,16 +1372,22 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
     ['Demais diretorias', /./]
   ];
   function semAcento(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-  function areaDe(cargo) { var c = semAcento(cargo); for (var i = 0; i < GREM_AREAS.length; i++) if (GREM_AREAS[i][1].test(c)) return i; return GREM_AREAS.length - 1; }
+  var GRUPOS = GREM_AREAS.map(function (a) { return a[0]; });
+  function areaDe(x) {
+    if (x.grupo && GRUPOS.indexOf(x.grupo) > -1) return GRUPOS.indexOf(x.grupo);
+    var c = semAcento(x.cargo), nome = GREM_AREAS[GREM_AREAS.length - 1][0];
+    for (var i = 0; i < GREM_AREAS.length; i++) if (GREM_AREAS[i][1].test(c)) { nome = GREM_AREAS[i][0]; break; }
+    var k = GRUPOS.indexOf(nome); return k > -1 ? k : GRUPOS.length - 1;
+  }
   function renderPublicGrem(list) {
     var g = $('gremGrid'); g.textContent = '';
-    var grupos = GREM_AREAS.map(function () { return []; });
-    list.forEach(function (x, i) { grupos[areaDe(x.cargo)].push({ x: x, i: i }); });
+    var grupos = GRUPOS.map(function () { return []; });
+    list.forEach(function (x, i) { grupos[areaDe(x)].push({ x: x, i: i }); });
     var n = 0;
     grupos.forEach(function (arr, gi) {
       if (!arr.length) return;
       arr.sort(function (a, b) { var va = /vice|suplente/.test(semAcento(a.x.cargo)) ? 1 : 0, vb = /vice|suplente/.test(semAcento(b.x.cargo)) ? 1 : 0; return va - vb || a.i - b.i; });
-      g.appendChild(el('h3', 'ghead', GREM_AREAS[gi][0]));
+      g.appendChild(el('h3', 'ghead', GRUPOS[gi]));
       arr.forEach(function (o) {
         var x = o.x, c = el('div', 'gcard'); c.appendChild(el('strong', null, x.nome)); if (x.cargo) c.appendChild(el('span', null, x.cargo)); if (x.turma) c.appendChild(el('small', 'gturma', 'Turma ' + x.turma));
         if (x.telefone || x.email) { var k = el('div', 'gcont'); if (x.telefone) { var t = el('a', null, x.telefone); t.href = 'tel:' + x.telefone.replace(/[^\d+]/g, ''); k.appendChild(t); } if (x.email) { var em = el('a', null, x.email); em.href = 'mailto:' + x.email; k.appendChild(em); } c.appendChild(k); }
@@ -1891,7 +1907,7 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
   /* presidência: cadastro de gremistas */
   function gremReset() {
     ['gremId', 'gremNome', 'gremCargo', 'gremTurma', 'gremIng', 'gremEnd', 'gremTel', 'gremMail'].forEach(function (i) { $(i).value = ''; });
-    $('gremSit').value = 'Ativo'; $('gremPub').checked = false; $('gremCPub').checked = false;
+    $('gremSit').value = 'Ativo'; $('gremGrupo').value = ''; $('gremPub').checked = false; $('gremCPub').checked = false;
     $('gremTitulo').textContent = 'Adicionar gremista'; $('gremSave').textContent = 'Adicionar'; $('gremCancel').hidden = true;
   }
   function renderGrem(list) {
@@ -1901,14 +1917,14 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
     list.forEach(function (x) {
       var it = el('div', 'pubitem');
       var left = el('div'); left.appendChild(el('strong', null, x.nome));
-      left.appendChild(el('div', 'm', [x.cargo, x.turma, x.situacao, x.publico === 'sim' ? 'no site' : 'só interno'].filter(Boolean).join(' · ')));
+      left.appendChild(el('div', 'm', [x.cargo, x.grupo, x.turma, x.situacao, x.publico === 'sim' ? 'no site' : 'só interno'].filter(Boolean).join(' · ')));
       var ct = [x.endereco, x.telefone, x.email].filter(Boolean).join(' · '); if (ct) left.appendChild(el('div', 'm', ct));
       it.appendChild(left);
       var acts = el('div'); acts.style.display = 'flex'; acts.style.gap = '6px';
       var e = el('button', 'btn line', 'Editar'); e.type = 'button';
       e.addEventListener('click', function () {
         $('gremId').value = x.id; $('gremNome').value = x.nome; $('gremCargo').value = x.cargo; $('gremTurma').value = x.turma;
-        $('gremSit').value = x.situacao || 'Ativo'; $('gremIng').value = x.ingresso; $('gremPub').checked = x.publico === 'sim';
+        $('gremSit').value = x.situacao || 'Ativo'; $('gremGrupo').value = (x.grupo && GRUPOS.indexOf(x.grupo) > -1) ? x.grupo : ''; $('gremIng').value = x.ingresso; $('gremPub').checked = x.publico === 'sim';
         $('gremEnd').value = x.endereco || ''; $('gremTel').value = x.telefone || ''; $('gremMail').value = x.email || ''; $('gremCPub').checked = x.contatoPublico === 'sim';
         $('gremTitulo').textContent = 'Editar gremista'; $('gremSave').textContent = 'Salvar alterações'; $('gremCancel').hidden = false;
         showMsg('gremOk', ''); $('gremErr').hidden = true; $('gremNome').focus();
@@ -1924,18 +1940,59 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
       acts.appendChild(e); acts.appendChild(d); it.appendChild(acts); box.appendChild(it);
     });
   }
-  function refreshPublicGrem() { if (API) fetch(API).then(function (r) { return r.json(); }).then(function (d) { if (d && d.ok) { renderPublicGrem(d.gremistas || []); renderPublicFotos(d.fotos || []); } }).catch(function () {}); }
+  function refreshPublicGrem() { if (API) fetch(API).then(function (r) { return r.json(); }).then(function (d) { if (d && d.ok) { if (Array.isArray(d.grupos) && d.grupos.length) GRUPOS = d.grupos; renderPublicGrem(d.gremistas || []); renderPublicFotos(d.fotos || []); } }).catch(function () {}); }
   async function loadGrem() {
     if (!can('grem.manage')) return;
     var r = await call({ action: 'grem.list' });
-    if (r && r.ok) renderGrem(r.itens);
+    if (r && r.ok) { if (Array.isArray(r.grupos) && r.grupos.length) GRUPOS = r.grupos; renderGrem(r.itens); renderGruposEd(); fillGrupoSel(); }
   }
+  function fillGrupoSel() {
+    var sel = $('gremGrupo'), v = sel.value; sel.textContent = '';
+    var o = el('option', null, 'Automático (pelo cargo)'); o.value = ''; sel.appendChild(o);
+    GRUPOS.forEach(function (n) { var op = el('option', null, n); op.value = n; sel.appendChild(op); });
+    sel.value = GRUPOS.indexOf(v) > -1 ? v : '';
+  }
+  var GED = [];
+  function renderGruposEd() {
+    GED = GRUPOS.map(function (n) { return { nome: n, antigo: n }; });
+    drawGED();
+  }
+  function drawGED() {
+    var box = $('gruposEd'); box.textContent = '';
+    GED.forEach(function (g, i) {
+      var row = el('div', 'pubitem'); row.style.alignItems = 'center';
+      var inp = el('input'); inp.type = 'text'; inp.maxLength = 60; inp.value = g.nome; inp.setAttribute('aria-label', 'Nome do grupo ' + (i + 1)); inp.style.flex = '1';
+      inp.addEventListener('input', function () { g.nome = inp.value; });
+      var acts = el('div'); acts.style.display = 'flex'; acts.style.gap = '6px';
+      function b(t, lab, fn, off) { var x = el('button', 'btn line', t); x.type = 'button'; x.setAttribute('aria-label', lab); x.disabled = !!off; x.addEventListener('click', fn); acts.appendChild(x); return x; }
+      b('↑', 'Subir', function () { GED.splice(i - 1, 0, GED.splice(i, 1)[0]); drawGED(); }, i === 0);
+      b('↓', 'Descer', function () { GED.splice(i + 1, 0, GED.splice(i, 1)[0]); drawGED(); }, i === GED.length - 1);
+      var del = b('Excluir', 'Excluir grupo', function () {
+        if (del.dataset.arm !== '1') { del.dataset.arm = '1'; del.textContent = 'Confirmar'; setTimeout(function () { del.dataset.arm = ''; del.textContent = 'Excluir'; }, 4000); return; }
+        GED.splice(i, 1); drawGED();
+      }, GED.length <= 1);
+      row.appendChild(inp); row.appendChild(acts); box.appendChild(row);
+    });
+  }
+  $('grupoAdd').addEventListener('click', function () {
+    var v = $('grupoNovo').value.trim(); $('grupoErr').hidden = true;
+    if (v.length < 2) { $('grupoErr').textContent = 'Digite o nome do novo grupo.'; $('grupoErr').hidden = false; return; }
+    GED.push({ nome: v, antigo: '' }); $('grupoNovo').value = ''; drawGED();
+  });
+  $('grupoSave').addEventListener('click', async function () {
+    showMsg('grupoOk', ''); $('grupoErr').hidden = true;
+    var btn = $('grupoSave'); btn.disabled = true;
+    var r = await call({ action: 'grupos.save', grupos: GED.map(function (g) { return { nome: g.nome, antigo: g.antigo }; }) });
+    btn.disabled = false;
+    if (r && r.ok) { GRUPOS = r.grupos; renderGruposEd(); fillGrupoSel(); renderGrem(r.itens); refreshPublicGrem(); showMsg('grupoOk', 'Grupos salvos. O site já foi atualizado.'); }
+    else { $('grupoErr').textContent = (r && r.erro) || 'Não foi possível salvar os grupos.'; $('grupoErr').hidden = false; }
+  });
   $('gremCancel').addEventListener('click', function () { gremReset(); showMsg('gremOk', ''); $('gremErr').hidden = true; });
   $('gremForm').addEventListener('submit', async function (e) {
     e.preventDefault(); showMsg('gremOk', ''); $('gremErr').hidden = true;
     if ($('gremNome').value.trim().length < 2) { $('gremErr').textContent = 'Informe o nome do gremista.'; $('gremErr').hidden = false; return; }
     var btn = $('gremSave'), old = btn.textContent; btn.disabled = true; btn.textContent = 'Salvando...';
-    var r = await call({ action: 'grem.save', id: $('gremId').value, nome: $('gremNome').value, cargo: $('gremCargo').value, turma: $('gremTurma').value, situacao: $('gremSit').value, ingresso: $('gremIng').value, publico: $('gremPub').checked, endereco: $('gremEnd').value, telefone: $('gremTel').value, email: $('gremMail').value, contatoPublico: $('gremCPub').checked });
+    var r = await call({ action: 'grem.save', grupo: $('gremGrupo').value, id: $('gremId').value, nome: $('gremNome').value, cargo: $('gremCargo').value, turma: $('gremTurma').value, situacao: $('gremSit').value, ingresso: $('gremIng').value, publico: $('gremPub').checked, endereco: $('gremEnd').value, telefone: $('gremTel').value, email: $('gremMail').value, contatoPublico: $('gremCPub').checked });
     btn.disabled = false; btn.textContent = old;
     if (r && r.ok) { var edit = !!$('gremId').value; renderGrem(r.itens); refreshPublicGrem(); gremReset(); showMsg('gremOk', edit ? 'Alterações salvas.' : 'Gremista adicionado.'); }
     else { $('gremErr').textContent = (r && r.erro) || 'Não foi possível salvar.'; $('gremErr').hidden = false; }
