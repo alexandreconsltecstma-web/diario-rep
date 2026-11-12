@@ -496,6 +496,69 @@ footer .credit { padding-right: 62px; }
   .igbtn2 { background-size: 200% 100%; animation: shine2 3.5s ease-in-out infinite; }
   @keyframes shine2 { 0%, 100% { background-position: 0 0; } 50% { background-position: 100% 0; } }
 }
+
+/* respiro: mais espaço entre blocos, textos e cartões */
+body { line-height: 1.6; }
+.top-in { padding-block: 30px; gap: 22px 32px; }
+.brandblock { gap: 20px; }
+.brandblock p, .brandblock .sub, .brandblock small { line-height: 1.5; margin-top: 8px; }
+.menu a, .menu button { padding-inline: 16px; }
+.menu-in { gap: 8px; }
+.page { gap: 40px 36px; padding-block: 44px 72px; }
+@media (min-width: 921px) { .page { grid-template-columns: minmax(0, 1fr) 320px; } }
+.area-side { gap: 28px; }
+.hero { padding: 44px; gap: 28px 40px; }
+.hero > * + * { margin-top: 2px; }
+.card-b { padding: 26px 28px; }
+.card-h { padding: 18px 28px; }
+.ed-card .meta { margin-top: 12px; }
+.ed-card .note { margin-top: 20px; padding-top: 20px; line-height: 1.6; }
+.btn { padding-block: 14px; }
+.btn.block { margin-top: 24px; }
+.types button { padding-block: 13px; padding-inline: 28px; }
+.info .t { padding: 22px 24px; line-height: 1.6; }
+.sec-h { gap: 14px 24px; margin-top: 8px; }
+.sec-h .kicker { margin-top: 10px; }
+.sec-act { gap: 20px; }
+.chips { gap: 12px; margin-block: 24px 28px; }
+.chip { padding: 9px 18px; }
+.strip { padding: 14px 20px; }
+.thead, .row { padding: 22px 20px; gap: 14px; }
+@media (min-width: 721px) { .thead, .row { grid-template-columns: 92px 102px minmax(0, 1fr) 88px 88px; } }
+.row .ttl { line-height: 1.65; }
+.row .ttl details, .row .ttl .anx { margin-top: 10px; }
+.band { padding-block: 80px; }
+.band .intro { margin-top: 18px; line-height: 1.7; }
+.band h2 + *, .band .kicker + h2 { margin-top: 6px; }
+.box { padding: 32px; }
+.box h3 { margin-bottom: 20px; }
+.box > h3:not(:first-child) { margin-top: 32px; }
+.field { gap: 8px; }
+.tabs { gap: 12px; margin-top: 32px; }
+.tabs button { padding: 13px 22px; }
+.tabs + .split, .tabs + .box { margin-top: 28px; }
+.pubitem, .inbtn { padding: 16px 0; gap: 6px 16px; }
+.gcards { gap: 18px; margin-top: 30px; }
+.ghead { margin: 36px 0 2px; padding-bottom: 10px; }
+.gcard { padding: 20px 22px; }
+.gcard span { margin-top: 6px; }
+footer { padding-block: 44px; line-height: 1.7; }
+footer .l p + p { margin-top: 8px; }
+footer .credit { margin-top: 26px; }
+@media (max-width: 920px) { .page { gap: 32px; padding-block: 32px 56px; } .area-side { gap: 24px; } }
+@media (max-width: 560px) {
+  .top-in { padding-block: 22px; gap: 16px; }
+  .hero { padding: 32px 24px; }
+  .band { padding-block: 56px; }
+  .box { padding: 24px 20px; }
+  .card-b { padding: 22px 22px; }
+  .card-h { padding: 16px 22px; }
+  .types button { padding-inline: 22px; }
+  .thead, .row { padding: 18px 18px; }
+  .gcards { gap: 14px; }
+  .ghead { margin-top: 28px; }
+  .chip { padding: 8px 16px; }
+}
 </style>
 </head>
 <body>
