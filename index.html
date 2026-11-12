@@ -261,6 +261,8 @@ ol.steps li > div { min-width: 0; padding-top: 4px; }
 .row .ttl summary { cursor: pointer; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; color: var(--muted); }
 .row .ttl details .paper { margin-top: 8px; max-height: 360px; overflow: auto; }
 .gcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 22px; }
+.ghead { grid-column: 1 / -1; margin: 18px 0 0; font-family: var(--serif); font-size: 1.35rem; color: var(--navy); border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.ghead:first-child { margin-top: 0; }
 .gcard { background: var(--bg); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: 8px; padding: 14px 16px; }
 .gcard strong { display: block; font-family: var(--serif); font-size: 1.2rem; }
 .gturma { display: block; margin-top: 4px; font-size: 0.78rem; color: var(--muted); }
@@ -374,6 +376,36 @@ footer .credit { padding-right: 62px; }
   .row .ttl details summary { display: none; }
   a { color: #000; text-decoration: none; }
 }
+.igbox { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.igbtn { display: inline-block; text-decoration: none; text-align: center; }
+.igmore { margin-top: 16px; font-size: 0.9rem; }
+.igmore a { color: var(--ink); font-weight: 700; text-decoration-color: var(--gold); text-underline-offset: 3px; }
+@media print { #instagram { display: none !important; } }
+.dash h4 { margin: 0 0 10px; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin: 14px 0 22px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--gold); border-radius: 8px; padding: 14px 16px; }
+.kpi strong { display: block; font-family: var(--serif); font-size: 1.9rem; line-height: 1.1; color: var(--ink); }
+.kpi span { font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.dgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+.brow { display: grid; grid-template-columns: minmax(90px, 1.2fr) 2fr auto; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.82rem; }
+.brow .bl { overflow-wrap: anywhere; }
+.bt { background: var(--line); border-radius: 4px; height: 10px; overflow: hidden; }
+.bf { display: block; height: 100%; background: linear-gradient(90deg, #B8861F, var(--gold-fill)); border-radius: 4px; }
+.bn { font-weight: 700; min-width: 1.5em; text-align: right; }
+.spark { display: flex; align-items: flex-end; gap: 4px; height: 110px; }
+.scol { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 3px; }
+.sbar { width: 100%; background: var(--gold-fill); border-radius: 3px 3px 0 0; min-height: 2px; }
+.scol small { font-size: 0.62rem; color: var(--muted); }
+::selection { background: var(--gold-fill); color: #061A35; }
+.sec-act { display: inline-flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+#instagram { background: linear-gradient(135deg, #061A35, #0C2650); color: #EEF1F7; border-top: 3px solid var(--gold-fill); }
+#instagram h2 { color: #fff; font-size: clamp(1.5rem, 4vw, 2.1rem); }
+#instagram .kicker { color: #E3B850; }
+#instagram .intro { color: #C9D3E6; max-width: 46ch; }
+.igbtn { gap: 10px; padding: 15px 22px; box-shadow: 0 8px 22px rgba(0,0,0,.3); transition: transform .2s ease, box-shadow .2s ease; }
+.igbtn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,.4); }
+.igbtn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+.dash, .kpi { box-shadow: 0 1px 2px rgba(6,26,53,.05); }
 </style>
 </head>
 <body>
@@ -459,8 +491,7 @@ footer .credit { padding-right: 62px; }
           <h2>Publicações recentes</h2>
           <p class="kicker">Consulta pública · Caderno de atos</p>
         </div>
-        <button type="button" class="all" id="todas">Ver todas &rarr;</button>
-        <button type="button" class="print-btn" id="printBtn">Imprimir / salvar PDF</button>
+        <span class="sec-act"><button type="button" class="print-btn" id="printBtn">Imprimir / salvar PDF</button><button type="button" class="all" id="todas">Ver todas &rarr;</button></span>
       </div>
       <div class="chips" id="chips"><span class="lbl">Filtrar por:</span></div>
       <div class="table">
@@ -477,6 +508,7 @@ footer .credit { padding-right: 62px; }
       <h2>Fotos dos eventos</h2>
       <p class="intro">Registros das atividades do Grêmio Estudantil R.E.P.</p>
       <div class="galeria" id="galGrid"></div>
+      <p class="igmore">Veja mais fotos e novidades dos eventos no <a href="https://www.instagram.com/rep.gremioestudantil_/" target="_blank" rel="noopener noreferrer">Instagram do grêmio (@rep.gremioestudantil_)</a>.</p>
     </div>
   </section>
 
@@ -767,6 +799,15 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
       </div>
 
       <div class="split" id="panO" role="tabpanel" aria-labelledby="tabO" hidden>
+        <div class="box span2 dash" id="ouvDash" aria-label="Painel da Ouvidoria">
+          <h3>Painel da Ouvidoria</h3>
+          <div class="kpis" id="dKpis"></div>
+          <div class="dgrid">
+            <div><h4>Por tipo</h4><div class="bars" id="dTipo"></div></div>
+            <div><h4>Por assunto</h4><div class="bars" id="dAssunto"></div></div>
+            <div><h4>Últimos 14 dias</h4><div class="spark" id="dDias" role="img" aria-label="Manifestações recebidas por dia nos últimos 14 dias"></div></div>
+          </div>
+        </div>
         <div class="box">
           <h3>Responder uma manifestação</h3>
           <form id="rspForm" onsubmit="return false">
@@ -895,6 +936,17 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
 </div>
 
 <noscript><div class="nojs">Este site precisa de JavaScript ativado para mostrar as publicações do Diário Oficial R.E.P.</div></noscript>
+<section class="band" id="instagram">
+  <div class="wrap igbox">
+    <div>
+      <p class="kicker">Redes sociais</p>
+      <h2>Acompanhe o grêmio no Instagram</h2>
+      <p class="intro">Fotos dos eventos, avisos e bastidores das atividades do R.E.P. ficam no nosso perfil.</p>
+    </div>
+    <a class="btn igbtn" href="https://www.instagram.com/rep.gremioestudantil_/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.8"/></svg>Abrir @rep.gremioestudantil_</a>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <div class="l">
@@ -1124,11 +1176,32 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
   $('lbNx').addEventListener('click', function () { lbShow(lbAt + 1); });
   $('lb').addEventListener('click', function (e) { if (e.target === $('lb')) lbHide(); });
   document.addEventListener('keydown', function (e) { if ($('lb').hidden) return; if (e.key === 'Escape') lbHide(); if (e.key === 'ArrowLeft') lbShow(lbAt - 1); if (e.key === 'ArrowRight') lbShow(lbAt + 1); });
+  var GREM_AREAS = [
+    ['Presidência', /presiden/],
+    ['Secretaria', /secretar|auxiliar administrativ/],
+    ['Tesouraria', /tesour/],
+    ['Ouvidoria', /ouvid/],
+    ['Imprensa, tecnologia e suporte técnico', /imprensa|tecnolog|suporte|criador/],
+    ['Eventos, cultura e esportes', /evento|sociocultural|cultura|esporte/],
+    ['Demais diretorias', /./]
+  ];
+  function semAcento(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  function areaDe(cargo) { var c = semAcento(cargo); for (var i = 0; i < GREM_AREAS.length; i++) if (GREM_AREAS[i][1].test(c)) return i; return GREM_AREAS.length - 1; }
   function renderPublicGrem(list) {
     var g = $('gremGrid'); g.textContent = '';
-    list.forEach(function (x, i) { var c = el('div', 'gcard'); c.appendChild(el('strong', null, x.nome)); if (x.cargo) c.appendChild(el('span', null, x.cargo)); if (x.turma) c.appendChild(el('small', 'gturma', 'Turma ' + x.turma));
-      if (x.telefone || x.email) { var k = el('div', 'gcont'); if (x.telefone) { var t = el('a', null, x.telefone); t.href = 'tel:' + x.telefone.replace(/[^\d+]/g, ''); k.appendChild(t); } if (x.email) { var em = el('a', null, x.email); em.href = 'mailto:' + x.email; k.appendChild(em); } c.appendChild(k); }
-      g.appendChild(c); watch(c, Math.min(i, 8) * 0.05); });
+    var grupos = GREM_AREAS.map(function () { return []; });
+    list.forEach(function (x, i) { grupos[areaDe(x.cargo)].push({ x: x, i: i }); });
+    var n = 0;
+    grupos.forEach(function (arr, gi) {
+      if (!arr.length) return;
+      arr.sort(function (a, b) { var va = /vice|suplente/.test(semAcento(a.x.cargo)) ? 1 : 0, vb = /vice|suplente/.test(semAcento(b.x.cargo)) ? 1 : 0; return va - vb || a.i - b.i; });
+      g.appendChild(el('h3', 'ghead', GREM_AREAS[gi][0]));
+      arr.forEach(function (o) {
+        var x = o.x, c = el('div', 'gcard'); c.appendChild(el('strong', null, x.nome)); if (x.cargo) c.appendChild(el('span', null, x.cargo)); if (x.turma) c.appendChild(el('small', 'gturma', 'Turma ' + x.turma));
+        if (x.telefone || x.email) { var k = el('div', 'gcont'); if (x.telefone) { var t = el('a', null, x.telefone); t.href = 'tel:' + x.telefone.replace(/[^\d+]/g, ''); k.appendChild(t); } if (x.email) { var em = el('a', null, x.email); em.href = 'mailto:' + x.email; k.appendChild(em); } c.appendChild(k); }
+        g.appendChild(c); watch(c, Math.min(n++, 8) * 0.05);
+      });
+    });
     $('gremistas').hidden = !list.length;
   }
   async function api(body) {
@@ -1457,7 +1530,38 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
 
   /* ouvidoria: caixa de entrada e respostas */
   var inboxItems = [], picked = '';
+  function renderDash() {
+    var L = inboxItems || [], box = $('ouvDash'); if (!box) return;
+    var total = L.length, novas = L.filter(function (o) { return o.status !== 'respondida'; }).length, resp = total - novas;
+    var dias = [], soma = 0;
+    L.forEach(function (o) { if (o.status === 'respondida' && o.recebidoEm && o.respondidoEm) { var d = (new Date(o.respondidoEm) - new Date(o.recebidoEm)) / 864e5; if (d >= 0) { dias.push(d); soma += d; } } });
+    var tempo = dias.length ? (soma / dias.length) : null;
+    var k = $('dKpis'); k.textContent = '';
+    [['Recebidas', total], ['Sem resposta', novas], ['Respondidas', resp], ['Taxa de resposta', total ? Math.round(resp * 100 / total) + '%' : '—'], ['Tempo médio', tempo === null ? '—' : (tempo < 1 ? 'menos de 1 dia' : tempo.toFixed(1).replace('.', ',') + ' dias')]].forEach(function (t) {
+      var d = el('div', 'kpi'); d.appendChild(el('strong', null, String(t[1]))); d.appendChild(el('span', null, t[0])); k.appendChild(d);
+    });
+    function bars(id, campo) {
+      var c = {}; L.forEach(function (o) { var v = o[campo] || 'Sem informação'; c[v] = (c[v] || 0) + 1; });
+      var ks = Object.keys(c).sort(function (a, b) { return c[b] - c[a]; }), max = ks.length ? c[ks[0]] : 1, n = $(id); n.textContent = '';
+      if (!ks.length) { n.appendChild(el('p', 'hint', 'Sem dados ainda.')); return; }
+      ks.forEach(function (v) {
+        var row = el('div', 'brow'); row.appendChild(el('span', 'bl', v));
+        var tr = el('span', 'bt'), f = el('span', 'bf'); f.style.width = Math.max(4, Math.round(c[v] * 100 / max)) + '%'; tr.appendChild(f); row.appendChild(tr);
+        row.appendChild(el('span', 'bn', String(c[v]))); n.appendChild(row);
+      });
+    }
+    bars('dTipo', 'tipo'); bars('dAssunto', 'assunto');
+    var sp = $('dDias'); sp.textContent = '';
+    var hoje = new Date(); hoje.setHours(0, 0, 0, 0); var cont = [], maxd = 1;
+    for (var i = 13; i >= 0; i--) { var d0 = new Date(hoje.getTime() - i * 864e5), n = 0; L.forEach(function (o) { if (!o.recebidoEm) return; var r = new Date(o.recebidoEm); r.setHours(0, 0, 0, 0); if (r.getTime() === d0.getTime()) n++; }); cont.push([d0, n]); if (n > maxd) maxd = n; }
+    cont.forEach(function (c) {
+      var col = el('div', 'scol'), bar = el('span', 'sbar'); bar.style.height = (c[1] ? Math.max(8, Math.round(c[1] * 100 / maxd)) : 2) + '%';
+      bar.title = c[0].toLocaleDateString('pt-BR') + ': ' + c[1]; col.appendChild(bar);
+      col.appendChild(el('small', null, String(c[0].getDate()))); sp.appendChild(col);
+    });
+  }
   function renderInbox() {
+    renderDash();
     var box = $('inbox'); box.textContent = '';
     $('inHint').textContent = inboxItems.length ? 'Toque numa manifestação para ler e responder.' : 'Nenhuma manifestação recebida ainda.';
     inboxItems.forEach(function (o) {
