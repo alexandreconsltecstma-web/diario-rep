@@ -340,6 +340,27 @@ footer .credit { padding-right: 62px; }
   .help[open] .hbody { animation: fadein .35s both; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+.galeria { display: grid; gap: 30px; margin-top: 26px; }
+.evt h3 { font-family: var(--serif); font-size: 1.4rem; margin: 0; }
+.evt .m { color: var(--muted); font-size: 0.82rem; }
+.gfotos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 10px; }
+.gph { padding: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--bg); cursor: zoom-in; aspect-ratio: 4 / 3; display: block; }
+.gph img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .25s ease; }
+.gph:hover img { transform: scale(1.04); }
+.lb { position: fixed; inset: 0; z-index: 90; background: rgba(6,14,28,.94); display: grid; place-items: center; padding: 16px; }
+.lb[hidden] { display: none; }
+.lb img { max-width: min(96vw, 1200px); max-height: 80vh; border-radius: 6px; background: #000; }
+.lb p { color: #fff; text-align: center; margin: 12px 0 0; font-size: 0.92rem; max-width: 70ch; }
+.lb button { position: absolute; border: 0; background: rgba(255,255,255,.16); color: #fff; font-size: 1.8rem; line-height: 1; width: 46px; height: 46px; border-radius: 50%; cursor: pointer; }
+.lb .x { top: 14px; right: 14px; } .lb .pv { left: 12px; top: 50%; } .lb .nx { right: 12px; top: 50%; }
+.fotoadm { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+.fotoadm figure { margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--bg); font-size: 0.76rem; }
+.fotoadm img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+.fotoadm figcaption { padding: 6px 8px; display: grid; gap: 6px; }
+.xbox details { border-top: 1px solid var(--line); padding: 10px 0; }
+.xbox summary { cursor: pointer; font-weight: 700; }
+.xbox .pubitem .m { word-break: break-word; }
 </style>
 </head>
 <body>
@@ -374,6 +395,7 @@ footer .credit { padding-right: 62px; }
     <button type="button" data-f="Edital">Editais</button>
     <button type="button" data-f="Comunicado">Comunicados</button>
     <button type="button" data-f="Prestação de contas">Prestação de contas</button>
+    <a href="#galeria" id="menuGal" hidden>Fotos</a>
     <a href="#ouvidoria">Ouvidoria</a>
   </div>
 </nav>
@@ -434,6 +456,15 @@ footer .credit { padding-right: 62px; }
       </div>
     </section>
   </div>
+
+  <section class="band" id="galeria" hidden>
+    <div class="wrap">
+      <p class="kicker">Galeria</p>
+      <h2>Fotos dos eventos</h2>
+      <p class="intro">Registros das atividades do Grêmio Estudantil R.E.P.</p>
+      <div class="galeria" id="galGrid"></div>
+    </div>
+  </section>
 
   <section class="band alt" id="gremistas" hidden>
     <div class="wrap">
@@ -630,6 +661,9 @@ footer .credit { padding-right: 62px; }
         <button type="button" role="tab" id="tabS" aria-selected="false" aria-controls="panS">Secretaria</button>
         <button type="button" role="tab" id="tabO" aria-selected="false" aria-controls="panO">Ouvidoria</button>
         <button type="button" role="tab" id="tabG" aria-selected="false" aria-controls="panG">Gremistas</button>
+        <button type="button" role="tab" id="tabF" aria-selected="false" aria-controls="panF">Fotos</button>
+        <button type="button" role="tab" id="tabX" aria-selected="false" aria-controls="panX">Excluir</button>
+        <button type="button" role="tab" id="tabK" aria-selected="false" aria-controls="panK">Senhas</button>
       </div>
 
       <div class="split" id="panP" role="tabpanel" aria-labelledby="tabP">
@@ -785,10 +819,66 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
           <div id="gremList"><p class="hint">Carregando...</p></div>
         </div>
       </div>
+
+      <div class="split" id="panF" role="tabpanel" aria-labelledby="tabF" hidden>
+        <div class="box">
+          <h3>Adicionar fotos de evento</h3>
+          <form id="fotoForm" onsubmit="return false">
+            <p class="hint">As fotos aparecem na hora na galeria pública do site. Publique só fotos de quem autorizou a imagem; no caso de menores, a escola precisa ter a autorização dos responsáveis.</p>
+            <div class="field"><label for="fotoEvento">Nome do evento</label><input type="text" id="fotoEvento" maxlength="100" placeholder="Ex.: Gincana de novembro"></div>
+            <div class="row2">
+              <div class="field"><label for="fotoData">Data do evento</label><input type="date" id="fotoData"></div>
+              <div class="field"><label for="fotoLegenda">Legenda (opcional)</label><input type="text" id="fotoLegenda" maxlength="200" placeholder="Ex.: Equipe azul vencedora"></div>
+            </div>
+            <div class="field"><label for="fotoFiles">Fotos (você pode escolher várias)</label><input type="file" id="fotoFiles" accept="image/jpeg,image/png,image/webp" multiple><span class="hint" id="fotoInfo">As fotos são reduzidas automaticamente antes de enviar.</span></div>
+            <div class="err" id="fotoErr" role="alert" hidden></div>
+            <div class="okmsg" id="fotoOk" role="status" hidden></div>
+            <div class="actions"><button class="btn" type="submit" id="fotoSend">Publicar fotos</button></div>
+          </form>
+        </div>
+        <div class="box">
+          <h3>Fotos publicadas <span class="hint" id="fotoCount"></span></h3>
+          <div id="fotoList"><p class="hint">Carregando...</p></div>
+        </div>
+      </div>
+
+      <div class="split" id="panK" role="tabpanel" aria-labelledby="tabK" hidden>
+        <div class="box span2">
+          <h3>Trocar senhas</h3>
+          <p class="hint">Escolha o setor e digite a nova senha (8 a 100 caracteres). Por segurança, confirme com a senha atual da Presidência. Quem estiver logado no setor trocado precisará entrar de novo. Use senhas diferentes para cada setor e não as envie por mensagem aberta.</p>
+          <form id="senhaForm" autocomplete="off" novalidate>
+            <div class="field"><label for="kAlvo">Setor</label><select id="kAlvo"><option value="ouvidoria">Ouvidoria</option><option value="secretaria">Secretaria</option><option value="presidencia">Presidência (a sua)</option></select></div>
+            <div class="field"><label for="kNova">Nova senha</label><input type="password" id="kNova" minlength="8" maxlength="100" autocomplete="new-password"></div>
+            <div class="field"><label for="kNova2">Repita a nova senha</label><input type="password" id="kNova2" minlength="8" maxlength="100" autocomplete="new-password"></div>
+            <div class="field"><label for="kAtual">Sua senha atual (Presidência)</label><input type="password" id="kAtual" maxlength="200" autocomplete="current-password"></div>
+            <div class="err" id="kErr" role="alert" hidden></div>
+            <div class="okmsg" id="kOk" role="status" hidden></div>
+            <button class="btn" type="submit" id="kBtn">Trocar senha</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="split" id="panX" role="tabpanel" aria-labelledby="tabX" hidden>
+        <div class="box span2 xbox">
+          <h3>Central de exclusão</h3>
+          <p class="hint">Só a Presidência vê esta área. Ao excluir, o item some do site na hora. Os registros ficam marcados como excluídos na planilha, e as fotos vão para a lixeira do Google Drive, então o administrador do site ainda consegue recuperar se for engano.</p>
+          <div class="field"><label for="xBusca">Procurar</label><input type="text" id="xBusca" placeholder="Digite parte do nome, número ou título" autocomplete="off"></div>
+          <div class="err" id="xErr" role="alert" hidden></div>
+          <div class="okmsg" id="xOk" role="status" hidden></div>
+          <div id="xLista"><p class="hint">Carregando...</p></div>
+        </div>
+      </div>
       </div>
     </div>
   </section>
 </main>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Foto ampliada">
+  <button type="button" class="x" id="lbX" aria-label="Fechar">&times;</button>
+  <button type="button" class="pv" id="lbPv" aria-label="Foto anterior">&#8249;</button>
+  <div style="text-align:center"><img id="lbImg" alt=""><p id="lbCap"></p></div>
+  <button type="button" class="nx" id="lbNx" aria-label="Próxima foto">&#8250;</button>
+</div>
 
 <footer>
   <div class="wrap">
@@ -974,10 +1064,42 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
   if (API) {
     fetch(API).then(function (r) { return r.json(); }).then(function (d) {
       if (d && d.ok && Array.isArray(d.gremistas)) renderPublicGrem(d.gremistas);
+      if (d && d.ok && Array.isArray(d.fotos)) renderPublicFotos(d.fotos);
       if (d && d.ok && Array.isArray(d.atos)) { applyState({ edicao: d.edicao && d.edicao.numero ? d.edicao : edFrom(d.atos), atos: d.atos }); renderTypes(); render(); }
     }).catch(function () {});
     $('conBox').hidden = false;
   }
+  var galList = [], lbAt = 0;
+  function fotoUrl(id, w) { return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w' + w; }
+  function renderPublicFotos(list) {
+    galList = list; var g = $('galGrid'); g.textContent = '';
+    var grupos = [], idx = {};
+    list.forEach(function (f, i) { var k = f.evento + '|' + f.data; if (!(k in idx)) { idx[k] = grupos.length; grupos.push({ evento: f.evento, data: f.data, itens: [] }); } grupos[idx[k]].itens.push({ f: f, i: i }); });
+    grupos.forEach(function (gr) {
+      var box = el('div', 'evt'); box.appendChild(el('h3', null, gr.evento)); if (gr.data) box.appendChild(el('span', 'm', fmtBR(gr.data) + ' · ' + gr.itens.length + (gr.itens.length === 1 ? ' foto' : ' fotos')));
+      var row = el('div', 'gfotos');
+      gr.itens.forEach(function (it) {
+        var b = el('button', 'gph'); b.type = 'button'; b.setAttribute('aria-label', 'Ampliar foto: ' + (it.f.legenda || gr.evento));
+        var im = el('img'); im.loading = 'lazy'; im.alt = it.f.legenda || gr.evento; im.src = fotoUrl(it.f.arquivo, 500); b.appendChild(im);
+        b.addEventListener('click', function () { lbShow(it.i); row.dataset.last = it.i; });
+        row.appendChild(b);
+      });
+      box.appendChild(row); g.appendChild(box);
+    });
+    $('galeria').hidden = !list.length; $('menuGal').hidden = !list.length;
+  }
+  function lbShow(i) {
+    if (!galList.length) return; lbAt = (i + galList.length) % galList.length; var f = galList[lbAt];
+    $('lbImg').src = fotoUrl(f.arquivo, 1600); $('lbImg').alt = f.legenda || f.evento;
+    $('lbCap').textContent = f.evento + (f.legenda ? ' · ' + f.legenda : '') + (f.data ? ' · ' + fmtBR(f.data) : '');
+    $('lb').hidden = false; $('lbX').focus();
+  }
+  function lbHide() { $('lb').hidden = true; $('lbImg').removeAttribute('src'); }
+  $('lbX').addEventListener('click', lbHide);
+  $('lbPv').addEventListener('click', function () { lbShow(lbAt - 1); });
+  $('lbNx').addEventListener('click', function () { lbShow(lbAt + 1); });
+  $('lb').addEventListener('click', function (e) { if (e.target === $('lb')) lbHide(); });
+  document.addEventListener('keydown', function (e) { if ($('lb').hidden) return; if (e.key === 'Escape') lbHide(); if (e.key === 'ArrowLeft') lbShow(lbAt - 1); if (e.key === 'ArrowRight') lbShow(lbAt + 1); });
   function renderPublicGrem(list) {
     var g = $('gremGrid'); g.textContent = '';
     list.forEach(function (x, i) { var c = el('div', 'gcard'); c.appendChild(el('strong', null, x.nome)); if (x.cargo) c.appendChild(el('span', null, x.cargo)); if (x.turma) c.appendChild(el('small', 'gturma', 'Turma ' + x.turma));
@@ -1063,13 +1185,15 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
   /* acesso dos setores: o servidor confere usuário e senha e define o que cada um pode fazer */
   var session = { token: '', papel: '', perms: [] };
   var NOME = { presidencia: 'Presidência', secretaria: 'Secretaria', ouvidoria: 'Ouvidoria' };
-  var tabs = [['tabP', 'panP'], ['tabS', 'panS'], ['tabO', 'panO'], ['tabG', 'panG']];
+  var tabs = [['tabP', 'panP'], ['tabS', 'panS'], ['tabO', 'panO'], ['tabG', 'panG'], ['tabF', 'panF'], ['tabX', 'panX'], ['tabK', 'panK']];
   function can(p) { return session.perms.indexOf(p) > -1; }
   function selectTab(id) {
     tabs.forEach(function (u) { $(u[0]).setAttribute('aria-selected', u[0] === id ? 'true' : 'false'); $(u[1]).hidden = u[1] !== tabs.filter(function (x) { return x[0] === id; })[0][1]; });
     if (id === 'tabS') loadPub();
     if (id === 'tabO') loadInbox();
     if (id === 'tabG') loadGrem();
+    if (id === 'tabF') loadFotos();
+    if (id === 'tabX') loadAdmin();
   }
   function lock(msg) {
     session = { token: '', papel: '', perms: [] };
@@ -1083,7 +1207,7 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
     $('dirLogin').hidden = true; $('dirTools').hidden = false; $('dirErr').hidden = true;
     Array.prototype.forEach.call($('dirHelp').querySelectorAll('[data-role]'), function (n) { n.hidden = n.getAttribute('data-role').split(' ').indexOf(s.papel) < 0; });
     $('dirWho').textContent = NOME[s.papel] || s.papel;
-    var vis = { tabP: s.papel === 'presidencia', tabS: can('docs.add'), tabO: can('ouv.list'), tabG: can('grem.manage') };
+    var vis = { tabP: s.papel === 'presidencia', tabS: can('docs.add'), tabO: can('ouv.list'), tabG: can('grem.manage'), tabF: can('fotos.add'), tabX: can('admin.delete'), tabK: can('senha.manage') };
     tabs.forEach(function (t) { $(t[0]).hidden = !vis[t[0]]; });
     $('renovBox').hidden = s.papel !== 'presidencia';
     if (s.papel === 'presidencia') loadDominio();
@@ -1091,6 +1215,23 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
     $('dirTools').querySelector('.tabs').hidden = tabs.filter(function (t) { return vis[t[0]]; }).length < 2;
     selectTab(first[0]);
   }
+  $('senhaForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var er = $('kErr'), okm = $('kOk'); er.hidden = true; okm.hidden = true;
+    var n1 = $('kNova').value;
+    if (n1.length < 8) { er.textContent = 'A nova senha precisa ter pelo menos 8 caracteres.'; er.hidden = false; return; }
+    if (n1 !== $('kNova2').value) { er.textContent = 'As duas senhas novas não são iguais.'; er.hidden = false; return; }
+    if (!$('kAtual').value) { er.textContent = 'Digite a sua senha atual da Presidência.'; er.hidden = false; return; }
+    var b = $('kBtn'); b.disabled = true; b.textContent = 'Trocando...';
+    var alvo = $('kAlvo').value;
+    var r = await call({ action: 'senha.set', alvo: alvo, nova: n1, atual: $('kAtual').value });
+    b.disabled = false; b.textContent = 'Trocar senha';
+    $('kAtual').value = '';
+    if (!r || !r.ok) { if (!(r && r.expirada)) { er.textContent = (r && r.erro) || 'Não foi possível trocar a senha.'; er.hidden = false; } return; }
+    $('kNova').value = ''; $('kNova2').value = '';
+    if (r.sair) { lock('Senha da Presidência trocada. Entre de novo com a senha nova.'); return; }
+    okm.textContent = 'Senha de ' + (NOME[alvo] || alvo) + ' trocada. Quem estava logado nesse setor precisa entrar de novo.'; okm.hidden = false;
+  });
   async function call(body) {
     body.token = session.token;
     var r = await api(body);
@@ -1335,6 +1476,114 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
     } else { $('rspErr').textContent = (r && r.erro) || 'Não foi possível salvar.'; $('rspErr').hidden = false; }
   });
 
+  /* fotos de eventos */
+  function readImg(file) {
+    return new Promise(function (res, rej) {
+      var img = new Image(), url = URL.createObjectURL(file);
+      img.onload = function () {
+        var k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+        res(c.toDataURL('image/jpeg', 0.82).split(',')[1]);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); rej(new Error('formato')); };
+      img.src = url;
+    });
+  }
+  function armBtn(b, label, fn) {
+    var armed = false;
+    b.addEventListener('click', function () {
+      if (!armed) { armed = true; b.textContent = 'Confirmar'; setTimeout(function () { armed = false; b.textContent = label; }, 4000); return; }
+      fn();
+    });
+  }
+  function renderFotos(list) {
+    var box = $('fotoList'); box.textContent = '';
+    $('fotoCount').textContent = list.length ? '(' + list.length + ')' : '';
+    if (!list.length) { box.appendChild(el('p', 'hint', 'Nenhuma foto publicada ainda.')); return; }
+    var wrap = el('div', 'fotoadm');
+    list.forEach(function (f) {
+      var fg = el('figure'), im = el('img'); im.loading = 'lazy'; im.alt = f.legenda || f.evento; im.src = fotoUrl(f.arquivo, 300); fg.appendChild(im);
+      var cap = el('figcaption'); cap.appendChild(el('span', null, f.evento + (f.data ? ' · ' + fmtBR(f.data) : '')));
+      if (can('fotos.remove')) {
+        var b = el('button', 'btn line', 'Excluir'); b.type = 'button';
+        armBtn(b, 'Excluir', async function () {
+          b.disabled = true; var r = await call({ action: 'fotos.remove', id: f.id });
+          if (r && r.ok) { renderFotos(r.fotos); renderPublicFotos(r.fotos); showMsg('fotoOk', 'Foto excluída.'); }
+          else { b.disabled = false; $('fotoErr').textContent = (r && r.erro) || 'Não foi possível excluir.'; $('fotoErr').hidden = false; }
+        });
+        cap.appendChild(b);
+      }
+      fg.appendChild(cap); wrap.appendChild(fg);
+    });
+    box.appendChild(wrap);
+  }
+  async function loadFotos() {
+    if (!can('fotos.add')) return;
+    if (!$('fotoData').value) $('fotoData').value = todayIso;
+    var r = await call({ action: 'fotos.list' });
+    if (r && r.ok) renderFotos(r.fotos);
+  }
+  $('fotoFiles').addEventListener('change', function () {
+    var n = $('fotoFiles').files.length; $('fotoInfo').textContent = n ? n + (n === 1 ? ' foto escolhida.' : ' fotos escolhidas.') : 'As fotos são reduzidas automaticamente antes de enviar.';
+  });
+  $('fotoForm').addEventListener('submit', async function (e) {
+    e.preventDefault(); showMsg('fotoOk', ''); $('fotoErr').hidden = true;
+    var files = Array.prototype.slice.call($('fotoFiles').files);
+    if ($('fotoEvento').value.trim().length < 3) { $('fotoErr').textContent = 'Informe o nome do evento.'; $('fotoErr').hidden = false; return; }
+    if (!$('fotoData').value) { $('fotoErr').textContent = 'Informe a data do evento.'; $('fotoErr').hidden = false; return; }
+    if (!files.length) { $('fotoErr').textContent = 'Escolha ao menos uma foto.'; $('fotoErr').hidden = false; return; }
+    var btn = $('fotoSend'), old = btn.textContent; btn.disabled = true; var feitas = 0, falhas = [];
+    for (var i = 0; i < files.length; i++) {
+      btn.textContent = 'Enviando ' + (i + 1) + ' de ' + files.length + '...';
+      try {
+        var b64 = await readImg(files[i]);
+        var r = await call({ action: 'fotos.add', evento: $('fotoEvento').value, data: $('fotoData').value, legenda: $('fotoLegenda').value, arquivo: { tipo: 'image/jpeg', b64: b64 } });
+        if (r && r.ok) { feitas++; renderFotos(r.fotos); renderPublicFotos(r.fotos); }
+        else { falhas.push(files[i].name + ': ' + ((r && r.erro) || 'erro')); if (r && r.expirada) break; }
+      } catch (er) { falhas.push(files[i].name + ': formato não suportado (use JPG, PNG ou WebP)'); }
+    }
+    btn.disabled = false; btn.textContent = old;
+    if (feitas) { showMsg('fotoOk', feitas + (feitas === 1 ? ' foto publicada.' : ' fotos publicadas.')); $('fotoFiles').value = ''; $('fotoInfo').textContent = 'As fotos são reduzidas automaticamente antes de enviar.'; }
+    if (falhas.length) { $('fotoErr').textContent = falhas.join(' | '); $('fotoErr').hidden = false; }
+  });
+
+  /* presidência: central de exclusão */
+  var ADM = null;
+  function renderAdmin() {
+    var box = $('xLista'); box.textContent = ''; if (!ADM) return;
+    var q = $('xBusca').value.trim().toLowerCase();
+    function match(t) { return !q || t.toLowerCase().indexOf(q) > -1; }
+    function grupo(titulo, itens, mk) {
+      var d = el('details'); var sm = el('summary', null, titulo + ' (' + itens.length + ')'); d.appendChild(sm);
+      if (q && itens.length) d.open = true;
+      if (!itens.length) d.appendChild(el('p', 'hint', 'Nada por aqui.'));
+      itens.forEach(function (x) { d.appendChild(mk(x)); });
+      box.appendChild(d);
+    }
+    function linha(tit, sub, req) {
+      var it = el('div', 'pubitem'), left = el('div'); left.appendChild(el('strong', null, tit)); if (sub) left.appendChild(el('div', 'm', sub)); it.appendChild(left);
+      var b = el('button', 'btn line', 'Excluir'); b.type = 'button';
+      armBtn(b, 'Excluir', async function () {
+        b.disabled = true; var r = await call(req);
+        if (r && r.ok) { ADM = r; renderAdmin(); refreshPublicGrem(); reloadAtos(); showMsg('xOk', 'Item excluído.'); $('xErr').hidden = true; }
+        else { b.disabled = false; $('xErr').textContent = (r && r.erro) || 'Não foi possível excluir.'; $('xErr').hidden = false; }
+      });
+      it.appendChild(b); return it;
+    }
+    grupo('Documentos do Diário', ADM.docs.filter(function (d) { return match(d.tipo + ' ' + d.numero + ' ' + d.titulo); }), function (d) { return linha(d.tipo + ' ' + d.numero, fmtBR(d.data) + ' · ' + d.titulo, { action: 'admin.delete', tipo: 'doc', id: d.id }); });
+    grupo('Fotos de eventos', ADM.fotos.filter(function (f) { return match(f.evento + ' ' + (f.legenda || '')); }), function (f) { return linha(f.evento, (f.data ? fmtBR(f.data) : '') + (f.legenda ? ' · ' + f.legenda : ''), { action: 'admin.delete', tipo: 'foto', id: f.id }); });
+    grupo('Gremistas', ADM.gremistas.filter(function (g) { return match(g.nome + ' ' + g.cargo); }), function (g) { return linha(g.nome, g.cargo, { action: 'admin.delete', tipo: 'grem', id: g.id }); });
+    grupo('Manifestações da Ouvidoria', ADM.ouv.filter(function (o) { return match(o.codigo + ' ' + o.assunto + ' ' + o.tipo); }), function (o) { return linha(o.codigo, o.tipo + ' · ' + o.assunto + ' · ' + (o.status === 'respondida' ? 'respondida' : 'sem resposta'), { action: 'admin.delete', tipo: 'ouv', codigo: o.codigo }); });
+  }
+  async function loadAdmin() {
+    if (!can('admin.delete')) return;
+    var r = await call({ action: 'admin.list' });
+    if (r && r.ok) { ADM = r; renderAdmin(); }
+  }
+  function reloadAtos() { if (API) fetch(API).then(function (r) { return r.json(); }).then(function (d) { if (d && d.ok && Array.isArray(d.atos)) reloadPublic(d.atos); }).catch(function () {}); }
+  $('xBusca').addEventListener('input', renderAdmin);
+
   /* presidência: cadastro de gremistas */
   function gremReset() {
     ['gremId', 'gremNome', 'gremCargo', 'gremTurma', 'gremIng', 'gremEnd', 'gremTel', 'gremMail'].forEach(function (i) { $(i).value = ''; });
@@ -1371,7 +1620,7 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
       acts.appendChild(e); acts.appendChild(d); it.appendChild(acts); box.appendChild(it);
     });
   }
-  function refreshPublicGrem() { if (API) fetch(API).then(function (r) { return r.json(); }).then(function (d) { if (d && d.ok) renderPublicGrem(d.gremistas || []); }).catch(function () {}); }
+  function refreshPublicGrem() { if (API) fetch(API).then(function (r) { return r.json(); }).then(function (d) { if (d && d.ok) { renderPublicGrem(d.gremistas || []); renderPublicFotos(d.fotos || []); } }).catch(function () {}); }
   async function loadGrem() {
     if (!can('grem.manage')) return;
     var r = await call({ action: 'grem.list' });
