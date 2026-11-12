@@ -421,6 +421,55 @@ footer .credit { padding-right: 62px; }
 .hero-dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 1px solid #fff; background: transparent; cursor: pointer; }
 .hero-dots button[aria-current="true"] { background: var(--gold-lt); border-color: var(--gold-lt); }
 @media (prefers-reduced-motion: reduce) { .hslide.on { animation: none; } }
+.destaques { margin-top: 22px; }
+.dmos { display: grid; gap: 6px; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1fr 1fr; height: clamp(300px, 42vw, 440px); border-radius: 12px; overflow: hidden; }
+.dmos.n0, .dmos.n1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+.dmos.n1 { grid-template-columns: 2fr 1fr; }
+.dmos.n2 { grid-template-columns: 2fr 1fr; }
+.dmos.n3 { grid-template-columns: 2fr 1fr 1fr; }
+.dmain { grid-row: 1 / span 2; position: relative; background: #061A35; }
+.dmos.n1 .dmain, .dmos.n2 .dmain { grid-row: 1 / span 2; }
+.dslide { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; padding: 0; cursor: zoom-in; background-size: cover; background-position: center; opacity: 0; transition: opacity .9s ease; }
+.dslide.on { opacity: 1; }
+.dmain::after, .dtile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,.78) 100%); pointer-events: none; }
+.dcap { position: absolute; left: 22px; right: 22px; bottom: 46px; z-index: 2; color: #fff; pointer-events: none; }
+.dcap small { display: block; font-size: 0.82rem; letter-spacing: 0.04em; opacity: .9; margin-bottom: 4px; }
+.dcap strong { display: block; font-family: var(--serif); font-size: clamp(1.4rem, 3.2vw, 2.3rem); line-height: 1.1; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+.ddots { position: absolute; left: 0; right: 0; bottom: 16px; z-index: 3; display: flex; justify-content: center; gap: 9px; }
+.ddots button { width: 9px; height: 9px; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.85); cursor: pointer; }
+.ddots button[aria-current="true"] { background: var(--gold-fill); }
+.dtile { position: relative; border: 0; padding: 0; cursor: zoom-in; background-size: cover; background-position: center; background-color: #0C2650; overflow: hidden; }
+.dtile .dtc { position: absolute; left: 12px; right: 12px; bottom: 10px; z-index: 2; color: #fff; text-align: left; }
+.dtile .dtc small { display: block; font-size: 0.7rem; opacity: .9; }
+.dtile .dtc strong { display: block; font-size: 0.86rem; line-height: 1.25; font-weight: 600; text-shadow: 0 1px 4px rgba(0,0,0,.6); }
+.dtile { transition: filter .25s; } .dtile:hover { filter: brightness(1.12); }
+@media (max-width: 760px) { .dmos, .dmos.n1, .dmos.n2, .dmos.n3 { grid-template-columns: 1fr 1fr; grid-template-rows: 2fr 1fr; height: 420px; } .dmos .dmain, .dmos.n1 .dmain, .dmos.n2 .dmain { grid-column: 1 / -1; grid-row: 1; } .dtile:nth-of-type(n+3) { display: none; } .dcap { bottom: 40px; } }
+@media print { #destaques { display: none !important; } }
+@media (prefers-reduced-motion: no-preference) {
+  .hero > img { animation: logoin 1s .15s cubic-bezier(.2,.9,.3,1.2) both, floaty 6s ease-in-out 1.4s infinite; }
+  @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+  .menu a, .menu button { position: relative; }
+  .sec-h h2, .band h2 { position: relative; display: inline-block; }
+  .sec-h h2::after, .band h2::after { content: ""; position: absolute; left: 0; bottom: -6px; height: 3px; width: 0; background: linear-gradient(90deg, #B8861F, var(--gold-lt)); border-radius: 2px; animation: draw 1s .4s ease forwards; }
+  @keyframes draw { to { width: 64px; } }
+  .igbtn { position: relative; overflow: hidden; }
+  .igbtn::after { content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent); transform: skewX(-20deg); animation: sweep 3.8s ease-in-out infinite; }
+  @keyframes sweep { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+  .dcap { animation: capin .8s .1s both; }
+  @keyframes capin { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .dtile { background-size: 100%; transition: background-size .6s ease, filter .25s; }
+  .dtile:hover { background-size: 112%; }
+  .dtile { animation: tilein .7s both; } .dtile:nth-of-type(2) { animation-delay: .12s; } .dtile:nth-of-type(3) { animation-delay: .24s; } .dtile:nth-of-type(4) { animation-delay: .36s; }
+  @keyframes tilein { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+  .kpi { animation: fadeup .6s both; } .kpi:nth-child(2) { animation-delay: .08s; } .kpi:nth-child(3) { animation-delay: .16s; } .kpi:nth-child(4) { animation-delay: .24s; } .kpi:nth-child(5) { animation-delay: .32s; }
+  .dbf { transform-origin: 0 50%; animation: grow .9s .2s ease both; }
+  @keyframes grow { from { transform: scaleX(0); } }
+  .sbar { transform-origin: 50% 100%; animation: rise .8s .2s ease both; }
+  @keyframes rise { from { transform: scaleY(0); } }
+  .types button:hover .n { transform: scale(1.25); } .types .n { display: inline-block; transition: transform .2s; }
+  .gcard { animation: none; }
+  .ghead::after { content: ""; display: block; }
+}
 </style>
 </head>
 <body>
@@ -461,6 +510,9 @@ footer .credit { padding-right: 62px; }
 </nav>
 
 <main>
+  <section class="wrap destaques" id="destaques" aria-label="Destaques: fotos dos eventos" hidden>
+    <div class="dmos" id="dMos"></div>
+  </section>
   <div class="wrap page">
     <section class="hero area-hero" aria-label="Edição atual">
       <div class="hero-slides" id="heroSlides" aria-hidden="true"></div>
@@ -1077,12 +1129,19 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
       box.appendChild(b);
     });
   }
+  function countUp(node, to, suffix) {
+    suffix = suffix || '';
+    if (!(to > 0) || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) { node.textContent = to + suffix; return; }
+    var t0 = null, dur = 900;
+    function step(t) { if (!t0) t0 = t; var k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); node.textContent = Math.round(to * e) + suffix; if (k < 1) requestAnimationFrame(step); }
+    node.textContent = '0' + suffix; requestAnimationFrame(step);
+  }
   function renderTypes() {
     var ul = $('types'); ul.textContent = '';
     TIPOS.forEach(function (t) {
       var n = atos.filter(function (a) { return a.tipo === t; }).length;
       var li = el('li'); var b = el('button'); b.type = 'button';
-      b.appendChild(el('span', null, t)); b.appendChild(el('span', 'n', String(n)));
+      b.appendChild(el('span', null, t)); var sn = el('span', 'n', String(n)); b.appendChild(sn); countUp(sn, n);
       b.addEventListener('click', function () { filter.tipos = [t]; render(); $('publicacoes').scrollIntoView({ block: 'start' }); });
       li.appendChild(b); ul.appendChild(li);
     });
@@ -1164,6 +1223,43 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
   }
   var galList = [], lbAt = 0;
   function fotoUrl(id, w) { return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w' + w; }
+  var dTimer = null, dAt = 0;
+  function destaques(list) {
+    var sec = $('destaques'), mos = $('dMos'); if (dTimer) { clearInterval(dTimer); dTimer = null; }
+    mos.textContent = ''; sec.hidden = !list.length; if (!list.length) return;
+    var big = list.slice(0, 5), side = list.slice(big.length >= 5 ? 5 : 0, 9);
+    if (list.length <= 5) side = list.slice(1, 5);   // poucas fotos: os pequenos mostram as próximas
+    mos.className = 'dmos n' + Math.min(side.length, 4);
+    function legenda(f) { return f.evento + (f.data ? ' · ' + fmtBR(f.data) : ''); }
+    var main = el('div', 'dmain'); mos.appendChild(main);
+    var slides = big.map(function (f, i) {
+      var b = el('button', 'dslide'); b.type = 'button'; b.setAttribute('aria-label', 'Ampliar foto: ' + legenda(f));
+      b.style.backgroundImage = 'url("' + fotoUrl(f.arquivo, 1400) + '")';
+      b.addEventListener('click', function () { lbShow(list.indexOf(f)); });
+      main.appendChild(b); return b;
+    });
+    var cap = el('div', 'dcap'); var k = el('small'); var t = el('strong'); cap.appendChild(k); cap.appendChild(t); main.appendChild(cap);
+    var dots = el('div', 'ddots'); var btns = big.map(function (f, i) { var d = el('button'); d.type = 'button'; d.setAttribute('aria-label', 'Foto ' + (i + 1)); d.addEventListener('click', function () { show(i); restart(); }); dots.appendChild(d); return d; });
+    if (big.length > 1) main.appendChild(dots);
+    function show(i) {
+      dAt = (i + big.length) % big.length;
+      slides.forEach(function (d, n) { d.classList.toggle('on', n === dAt); });
+      btns.forEach(function (d, n) { d.setAttribute('aria-current', n === dAt ? 'true' : 'false'); });
+      var f = big[dAt]; k.textContent = 'Eventos do grêmio'; t.textContent = f.legenda || f.evento; if (f.legenda) k.textContent = f.evento;
+    }
+    function restart() {
+      if (dTimer) clearInterval(dTimer);
+      if (big.length > 1 && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) dTimer = setInterval(function () { if (!document.hidden) show(dAt + 1); }, 5500);
+    }
+    side.forEach(function (f) {
+      var b = el('button', 'dtile'); b.type = 'button'; b.setAttribute('aria-label', 'Ampliar foto: ' + legenda(f));
+      b.style.backgroundImage = 'url("' + fotoUrl(f.arquivo, 700) + '")';
+      var c = el('span', 'dtc'); c.appendChild(el('small', null, fmtBR(f.data))); c.appendChild(el('strong', null, f.legenda || f.evento)); b.appendChild(c);
+      b.addEventListener('click', function () { lbShow(list.indexOf(f)); });
+      mos.appendChild(b);
+    });
+    show(0); restart();
+  }
   var heroTimer = null, heroAt = 0;
   function heroSlides(list) {
     var hero = document.querySelector('.hero'), box = $('heroSlides'), cap = $('heroCap');
@@ -1192,8 +1288,7 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
     hero.classList.add('has-slides'); cap.hidden = false; show(0); restart();
   }
   function renderPublicFotos(list) {
-    heroSlides(list);
-    galList = list; var g = $('galGrid'); g.textContent = '';
+    galList = list; destaques(list); var g = $('galGrid'); g.textContent = '';
     var grupos = [], idx = {};
     list.forEach(function (f, i) { var k = f.evento + '|' + f.data; if (!(k in idx)) { idx[k] = grupos.length; grupos.push({ evento: f.evento, data: f.data, itens: [] }); } grupos[idx[k]].itens.push({ f: f, i: i }); });
     grupos.forEach(function (gr) {
@@ -1583,7 +1678,7 @@ A ouvidoria apresentará as sugestões recebidas na próxima reunião.</textarea
     var tempo = dias.length ? (soma / dias.length) : null;
     var k = $('dKpis'); k.textContent = '';
     [['Recebidas', total], ['Sem resposta', novas], ['Respondidas', resp], ['Taxa de resposta', total ? Math.round(resp * 100 / total) + '%' : '—'], ['Tempo médio', tempo === null ? '—' : (tempo < 1 ? 'menos de 1 dia' : tempo.toFixed(1).replace('.', ',') + ' dias')]].forEach(function (t) {
-      var d = el('div', 'kpi'); d.appendChild(el('strong', null, String(t[1]))); d.appendChild(el('span', null, t[0])); k.appendChild(d);
+      var d = el('div', 'kpi'); var sg = el('strong', null, String(t[1])); d.appendChild(sg); if (typeof t[1] === 'number') countUp(sg, t[1]); else if (/%$/.test(t[1])) countUp(sg, parseInt(t[1], 10), '%'); d.appendChild(el('span', null, t[0])); k.appendChild(d);
     });
     function bars(id, campo) {
       var c = {}; L.forEach(function (o) { var v = o[campo] || 'Sem informação'; c[v] = (c[v] || 0) + 1; });
